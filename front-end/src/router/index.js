@@ -11,19 +11,14 @@ const routes = [
     component: Home
   },
   {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile
-  },
-  {
     path: '/item/:id',
-    name: 'item',
+    name: 'Item',
     componet: Item
   },
   {
-    path: '/areaFilter',
-    name: 'AreaFilter',
-    component: AreaFilter
+    path: '/profile',
+    name: 'Profile',
+    componet: Profile
   }
 ]
 

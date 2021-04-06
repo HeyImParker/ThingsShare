@@ -1,4 +1,4 @@
-# things-share
+# front-end
 
 ## Project setup
 ```

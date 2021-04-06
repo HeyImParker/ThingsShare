@@ -1,21 +1,20 @@
 <template>
   <div class="home">
-    <div class="item" v-for="item in items" :to="'/item/' + item.id" :key="item._id">
-      <h2>{{item.name}}</h2>
+    <div v-for="item in items" :key="item.id">
+      <h2>{{item.title}}</h2>
       <img :src="item.path" />
-      <p>${{item.cost}}</p>
+      <p>{{item.discription}}</p>
     </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
 import axios from 'axios';
 export default {
   name: 'Home',
   data() {
     return {
-      items: [],
+     items: [],
     }
   },
   created() {
@@ -30,7 +29,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
-    }
-  },
+    },
+  }
 }
 </script>
