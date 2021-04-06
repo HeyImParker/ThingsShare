@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <p>test</p>
     <div v-for="item in items" :key="item.id">
       <h2>{{item.title}}</h2>
       <img :src="item.path" />

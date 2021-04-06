@@ -15,13 +15,13 @@ const routes = [
   {
     path: '/item/:id',
     name: 'Item',
-    componet: Item
+    component: Item
   },
   {
     path: '/profile',
     name: 'Profile',
-    componet: Profile
-  }
+    component: Profile
+  },
 ]
 
 const router = new VueRouter({
