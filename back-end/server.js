@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 // connect to the database
-mongoose.connect('mongodb://localhost:27017/thing-to-rent', {
+mongoose.connect('mongodb://localhost:27017/thing-share', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -104,10 +104,26 @@ const itemSchema = new mongoose.Schema({
 // Model for items
 const Item = mongoose.model('Item',itemSchema);
 
+//return all items
 app.get('/api/items', async (req,res) => {
     try {
-        let items = await Items.find();
+        let items = await Item.find();
         res.send(items);
+    } catch(error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+});
+
+//return specific item
+app.get('/api/items/:itemID', async (req, res) => {
+    try {
+        let item = await Item.findOne({_id: req.params.itemID});
+        if(!item) {
+            res.send(404);
+            return;
+        }
+        res.send(item);
     } catch(error) {
         console.log(error);
         res.sendStatus(500);
