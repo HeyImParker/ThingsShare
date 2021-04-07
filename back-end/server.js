@@ -73,6 +73,23 @@ app.get('/api/profile', async (req, res) => {
     }
 });
 
+app.put('/api/profile/:profileID', async (req, res) => {
+    try {
+        let profile = await Profile.findOne({_id:req.params.profileID});
+        if (!profile) {
+            res.send(404);
+            return;
+        }
+        profile.name = req.body.name;
+        profile.location = req.body.location;
+        await profile.save();
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
 // Delete a profile
 app.delete('/api/profile/:profileID', async (req, res) => {
     try {
@@ -98,7 +115,7 @@ const itemSchema = new mongoose.Schema({
     name: String,
     path: String,
     discription: String,
-    cost: Number
+    cost: String
 });
 
 // Model for items
@@ -133,16 +150,19 @@ app.get('/api/items/:itemID', async (req, res) => {
 //Methods by profile
 app.post('/api/profiles/:profileID/items', async (req, res) => {
     try {
-        let profile = await Project.findOne({_id: req.params.profileID});
+        let profile = await Profile.findOne({_id: req.params.profileID});
         if (!profile) {
             res.send(404);
             return;
         }
         let item = new Item({
             owner: profile,
-            text: req.body.text,
-            completed: req.body.completed,
+            name: req.body.name,
+            path: req.body.path,
+            discription: req.body.discription,
+            cost: req.body.cost
         });
+        console.log(profile) //debug
         await item.save();
         res.send(item);
     } catch (error) {

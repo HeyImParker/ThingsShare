@@ -10,8 +10,19 @@
     </div>
     <div v-if="profile">
         <div class="heading">
-        <div class="circle">1</div>
-        <h2>Add an Item</h2>
+          <div class="user-info" v-if="editMode">
+            <p>Name: <input v-model="edit.name"></p>
+            <p>Location: <input v-model="edit.location"></p>
+            <button @click="editToggle()">Cancel</button>
+            <button @click="editProfile()">Confirm</button>
+            <button @click="deleteProfile()">Delete</button>
+          </div>
+          <div v-else>
+            <p>Current profile: {{profile.name}}</p>
+            <p>Location: {{profile.location}}</p>
+            <button @click="editToggle()">Profile Options</button>
+          </div>
+          <h2>Add an Item</h2>
         </div>
         <div class="add">
         <div class="form">
@@ -46,7 +57,7 @@
             <p></p>
             <textarea v-model="findItem.discription"></textarea>
             <p></p>
-            <input v-model="findItem.price" placeholder="Price">
+            <input v-model="findItem.price" placeholder="Price (e.g. $5/day)">
             <p></p>
             <img :src="findItem.path" />
         </div>
@@ -79,7 +90,9 @@ export default {
         items: [],
         findTitle: "",
         findItem: null,
-        focus: false
+        focus: false,
+        editMode: false,
+        edit: {}
     }
   },
   computed: {
@@ -99,18 +112,53 @@ export default {
     fileChanged(event) {
       this.file = event.target.files[0]
     },
+    editToggle() {
+      this.edit.name = this.profile.name;
+      this.edit.location = this.profile.location;
+      this.editMode = !(this.editMode);
+    },
+    async editProfile() {
+      try {
+        await axios.put("/api/profile/" + this.profile._id, {
+          name: this.edit.name,
+          location: this.edit.location,
+        });
+        this.profile.name = this.edit.name;
+        this.profile.location = this.edit.location;
+        this.editMode = !(this.editMode);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async deleteProfile() {
+      try {
+        await axios.delete("/api/profile/" + this.profile._id);
+        for(let i = 1; i < this.users.length; i++) {
+          if(this.users[i]._id == this.profile._id) {
+            this.users.splice(i,1);
+          }
+        }
+        this.profile = null;
+        this.editMode = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async upload() {
       try {
         const formData = new FormData();
         formData.append('photo', this.file, this.file.name)
         let r1 = await axios.post('/api/photos', formData);
-        let r2 = await axios.post('/api/items', {
-          title: this.title,
+        let api = '/api/profiles/' + this.profile._id + '/items';
+        console.log(api);
+        let r2 = await axios.post(api, {
+          name: this.name,
           path: r1.data.path,
           price: this.price,
           discription: this.discription
         });
         this.addItem = r2.data;
+        this.items.push(r2.data);
       } catch (error) {
         console.log(error);
       }
@@ -154,8 +202,8 @@ export default {
             let newProfile = await axios.post('/api/profile', {
                 name: name
             });
-            console.log(newProfile);
             this.selectUser(newProfile.data);
+            this.users.push(newProfile.data);
         } catch(error) {
             console.log(error);
         }
