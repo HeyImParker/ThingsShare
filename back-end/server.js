@@ -73,11 +73,27 @@ app.get('/api/profile', async (req, res) => {
     }
 });
 
-app.put('/api/profile/:profileID', async (req, res) => {
+// Get a specific profile
+app.get('/api/profile/:profileID', async (req, res) => {
     try {
         let profile = await Profile.findOne({_id:req.params.profileID});
         if (!profile) {
-            res.send(404);
+            res.sendStatus(404);
+            return;
+        }
+        res.send(profile);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500);
+    }
+})
+
+app.put('/api/profile/:profileID', async (req, res) => {
+    try {
+        console.log(req.params.profileID); ///debug
+        let profile = await Profile.findOne({_id:req.params.profileID});
+        if (!profile) {
+            res.sendStatus(404);
             return;
         }
         profile.name = req.body.name;
@@ -115,7 +131,7 @@ const itemSchema = new mongoose.Schema({
     name: String,
     path: String,
     discription: String,
-    cost: String
+    price: String
 });
 
 // Model for items
@@ -160,9 +176,8 @@ app.post('/api/profiles/:profileID/items', async (req, res) => {
             name: req.body.name,
             path: req.body.path,
             discription: req.body.discription,
-            cost: req.body.cost
+            price: req.body.price
         });
-        console.log(profile) //debug
         await item.save();
         res.send(item);
     } catch (error) {
@@ -188,7 +203,7 @@ app.get('/api/profiles/:profileID/items', async (req, res) => {
 
 app.put('/api/profiles/:profileID/items/:itemID', async (req, res) => {
     try {
-        let item = await Item.findOne({_id:req.params.itemID, profile: req.params.profileID});
+        let item = await Item.findOne({_id:req.params.itemID, owner: req.params.profileID});
         if (!item) {
             res.send(404);
             return;
@@ -196,7 +211,7 @@ app.put('/api/profiles/:profileID/items/:itemID', async (req, res) => {
         item.name = req.body.name;
         item.path = req.body.path;
         item.discription = req.body.discription;
-        item.cost = req.body.cost;
+        item.price = req.body.price;
         await item.save();
         res.send(item);
     } catch (error) {
@@ -207,7 +222,7 @@ app.put('/api/profiles/:profileID/items/:itemID', async (req, res) => {
 
 app.delete('/api/profiles/:profileID/items/:itemID', async (req, res) => {
     try {
-        let item = await Item.findOne({_id:req.params.itemID, project: req.params.profileID});
+        let item = await Item.findOne({_id:req.params.itemID, owner: req.params.profileID});
         if (!item) {
             res.send(404);
             return;

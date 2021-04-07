@@ -1,11 +1,13 @@
 <template>
 <div class="admin">
-    <h1>The Admin Page!</h1>
     <div class="form">
-        <input v-model="user" placeholder="Username" @focus="focus=true">
+        <div v-if="profile">
+          <button @click="changeProfile()">Change Profile</button>
+        </div>
+        <input v-else v-model="user" placeholder="Profile Name" @focus="focus=true">
         <div class="suggestions" v-if="focus">
             <div class="suggestion" v-for="s in suggestionsUser" :key="s._id" @click="selectUser(s)">{{s.name}}</div>
-            <div class="suggestion" @click="createNewUser(user)">Create "{{this.user}}"</div>
+            <div class="suggestion" v-if="user.length > 0" @click="createNewUser(user)">Create "{{this.user}}"</div>
         </div>
     </div>
     <div v-if="profile">
@@ -26,18 +28,17 @@
         </div>
         <div class="add">
         <div class="form">
-            <input v-model="name" placeholder="Name">
+            <input v-model="item.name" placeholder="Name">
             <p></p>
-            <textarea v-model="discription" placeholder="Discription"></textarea>
+            <textarea v-model="item.discription" placeholder="Discription"></textarea>
             <p></p>
-            <input v-model="price" placeholder="Price">
+            <input v-model="item.price" placeholder="Price">
             <p></p>
             <input type="file" name="photo" @change="fileChanged">
             <button @click="upload">Upload</button>
         </div>
         <div class="upload" v-if="addItem">
-            <h2>{{addItem.title}}</h2>
-            <img :src="addItem.path" />
+            <p>{{addItem.name}} successfully added!</p>
         </div>
         </div>
         <div class="heading">
@@ -48,12 +49,12 @@
         <div class="form">
             <input v-model="findTitle" placeholder="Search">
             <div class="suggestions" v-if="suggestionsItem.length > 0">
-            <div class="suggestion" v-for="s in suggestionsItem" :key="s.id" @click="selectItem(s)">{{s.title}}
-            </div>
+              <div class="suggestion" v-for="s in suggestionsItem" :key="s.id" @click="selectItem(s)">{{s.name}}
+              </div>
             </div>
         </div>
         <div class="upload" v-if="findItem">
-            <input v-model="findItem.title">
+            <input v-model="findItem.name">
             <p></p>
             <textarea v-model="findItem.discription"></textarea>
             <p></p>
@@ -79,20 +80,21 @@ export default {
   name: 'Profile',
   data() {
     return {
+        //for finding user
         users: [],
         user: "",
+        focus: false,
+        //for profile editing
+        editMode: false,
+        edit: {},
         profile: null,
-        name: "",
-        discription: "",
-        price: null,
-        file: null,
+        //for adding new items
+        item: {},
         addItem: null,
+        //for item search
         items: [],
         findTitle: "",
         findItem: null,
-        focus: false,
-        editMode: false,
-        edit: {}
     }
   },
   computed: {
@@ -106,12 +108,41 @@ export default {
     },
   },
   created() {
-      this.getUsers();
+    this.getUsers();
   },
   methods: {
-    fileChanged(event) {
-      this.file = event.target.files[0]
+    //methods for profile functionality
+    async getUsers() {
+      try {
+        let response = await axios.get("/api/profile");
+            this.users = response.data;
+            return true;
+        } catch (error) {
+          console.log(error);
+        }
     },
+    selectUser(item) {
+        this.user = "";
+        this.focus = false;
+        this.profile = item;
+        this.getItems();
+    },
+    async createNewUser(name) {
+        try {
+            let newProfile = await axios.post('/api/profile', {
+                name: name
+            });
+            this.selectUser(newProfile.data);
+            this.users.push(newProfile.data);
+        } catch(error) {
+            console.log(error);
+        }
+    },
+    changeProfile() {
+      this.profile = null;
+      this.addItem = null;
+    },
+    //Profile option buttons
     editToggle() {
       this.edit.name = this.profile.name;
       this.edit.location = this.profile.location;
@@ -132,30 +163,40 @@ export default {
     },
     async deleteProfile() {
       try {
+        for(let i = 0; i < this.items.length; i++) {
+          await axios.delete("/api/profiles/" + this.profile._id + "/items/" + this.items[i]._id);
+        }
         await axios.delete("/api/profile/" + this.profile._id);
-        for(let i = 1; i < this.users.length; i++) {
+        for(let i = 0; i < this.users.length; i++) {
           if(this.users[i]._id == this.profile._id) {
             this.users.splice(i,1);
+            break;
           }
         }
         this.profile = null;
+        this.items = [];
         this.editMode = false;
       } catch (error) {
         console.log(error);
       }
     },
+
+    //Item functionality
+    //Facilites adding photos to item
+    fileChanged(event) {
+      this.item.file = event.target.files[0]
+    },
+    //Add item
     async upload() {
       try {
         const formData = new FormData();
-        formData.append('photo', this.file, this.file.name)
+        formData.append('photo', this.item.file, this.item.file.name)
         let r1 = await axios.post('/api/photos', formData);
-        let api = '/api/profiles/' + this.profile._id + '/items';
-        console.log(api);
-        let r2 = await axios.post(api, {
-          name: this.name,
+        let r2 = await axios.post('/api/profiles/' + this.profile._id + '/items', {
+          name: this.item.name,
           path: r1.data.path,
-          price: this.price,
-          discription: this.discription
+          price: this.item.price,
+          discription: this.item.discription
         });
         this.addItem = r2.data;
         this.items.push(r2.data);
@@ -172,45 +213,17 @@ export default {
         console.log(error);
       }
     },
-    async getUsers() {
-        try {
-            let response = await axios.get("/api/profile");
-            this.users = response.data;
-            return true;
-        } catch (error) {
-            console.log(error);
-        }
-    },
     selectItem(item) {
       this.findTitle = "";
       this.findItem = item;
     },
-    async selectUser(item) {
-        this.user = "";
-        this.focus = false;
-        this.profile = item;
-        try {
-            let response = await axios.get("/api/profiles/" + this.profile._id + "/items");
-            this.items = response.data;
-            return true;
-        } catch (error) {
-            console.log(error);
-        }
-    },
-    async createNewUser(name) {
-        try {
-            let newProfile = await axios.post('/api/profile', {
-                name: name
-            });
-            this.selectUser(newProfile.data);
-            this.users.push(newProfile.data);
-        } catch(error) {
-            console.log(error);
-        }
-    },
-    async deleteItem(item) {
+    async editItem(item) {
       try {
-        await axios.delete("/api/items/" + item._id);
+        await axios.put("/api/profiles/" + this.profile._id + "/items/" + item._id, {
+          name: this.findItem.name,
+          discription: this.findItem.discription,
+          price: this.findItem.price
+        });
         this.findItem = null;
         this.getItems();
         return true;
@@ -218,13 +231,9 @@ export default {
         console.log(error);
       }
     },
-    async editItem(item) {
+    async deleteItem(item) {
       try {
-        await axios.put("/api/items/" + item._id, {
-          title: this.findItem.title,
-          discription: this.findItem.discription,
-          price: this.findItem.price
-        });
+        await axios.delete("/api/profiles/" + this.profile._id + "/items/" + item._id);
         this.findItem = null;
         this.getItems();
         return true;

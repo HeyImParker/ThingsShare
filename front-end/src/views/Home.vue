@@ -1,11 +1,11 @@
 <template>
   <div class="home">
-    <p>test</p>
-    <div v-for="item in items" :key="item.id">
-      <h2>{{item.title}}</h2>
+    <h1>Catalog</h1>
+    <router-link v-for="item in items" :key="item.id" :to="'/item/' + item._id">
+      <h2>{{item.name}}</h2>
       <img :src="item.path" />
-      <p>{{item.discription}}</p>
-    </div>
+      <p>{{item.price}}</p>
+    </router-link>
   </div>
 </template>
 
