@@ -1,10 +1,10 @@
 <template>
-<div class="admin">
-    <div class="form">
+<div>
+    <div>
         <div v-if="profile">
           <button @click="changeProfile()">Change Profile</button>
         </div>
-        <input v-else v-model="user" placeholder="Profile Name" @focus="focus=true">
+        <input class="suggestions input" v-else v-model="user" placeholder="Profile Name" @focus="focus=true">
         <div class="suggestions" v-if="focus">
             <div class="suggestion" v-for="s in suggestionsUser" :key="s._id" @click="selectUser(s)">{{s.name}}</div>
             <div class="suggestion" v-if="user.length > 0" @click="createNewUser(user)">Create "{{this.user}}"</div>
@@ -12,64 +12,72 @@
     </div>
     <div v-if="profile">
         <div class="heading">
-          <div class="user-info" v-if="editMode">
-            <p>Name: <input v-model="edit.name"></p>
-            <p>Location: <input v-model="edit.location"></p>
-            <button @click="editToggle()">Cancel</button>
-            <button @click="editProfile()">Confirm</button>
-            <button @click="deleteProfile()">Delete</button>
+          <div class="profile-info" v-if="editMode">
+            <div class="row">
+              <p>Name: <input v-model="edit.name"></p>
+              <p>Location: <input v-model="edit.location"></p>
+            </div>
+            <div>
+              <button @click="editToggle()">Cancel</button>
+              <button @click="editProfile()">Confirm</button>
+              <button @click="deleteProfile()">Delete</button>
+            </div>
           </div>
-          <div v-else>
-            <p>Current profile: {{profile.name}}</p>
-            <p>Location: {{profile.location}}</p>
+          <div class="profile-info" v-else>
+            <div class="row">
+              <p>Current profile: {{profile.name}}</p>
+              <p>Location: {{profile.location}}</p>
+            </div>
             <button @click="editToggle()">Profile Options</button>
           </div>
+        </div>
+        <p></p>
+        <div class="row">
+          <div class="add">
           <h2>Add an Item</h2>
-        </div>
-        <div class="add">
-        <div class="form">
-            <input v-model="item.name" placeholder="Name">
-            <p></p>
-            <textarea v-model="item.discription" placeholder="Discription"></textarea>
-            <p></p>
-            <input v-model="item.price" placeholder="Price">
-            <p></p>
-            <input type="file" name="photo" @change="fileChanged">
-            <button @click="upload">Upload</button>
-        </div>
-        <div class="upload" v-if="addItem">
-            <p>{{addItem.name}} successfully added!</p>
-        </div>
-        </div>
-        <div class="heading">
-        <div class="circle">2</div>
-        <h2>Edit or Delete an Item</h2>
-        </div>
-        <div class="edit">
-        <div class="form">
-            <input v-model="findTitle" placeholder="Search">
-            <div class="suggestions" v-if="suggestionsItem.length > 0">
-              <div class="suggestion" v-for="s in suggestionsItem" :key="s.id" @click="selectItem(s)">{{s.name}}
-              </div>
+            <div class="form">
+                <input v-model="item.name" placeholder="Name">
+                <p></p>
+                <textarea v-model="item.discription" placeholder="Discription"></textarea>
+                <p></p>
+                <input v-model="item.price" placeholder="Price">
+                <p></p>
+                <input type="file" name="photo" @change="fileChanged">
+                <p></p>
+                <button @click="upload">Upload</button>
             </div>
-        </div>
-        <div class="upload" v-if="findItem">
-            <input v-model="findItem.name">
-            <p></p>
-            <textarea v-model="findItem.discription"></textarea>
-            <p></p>
-            <input v-model="findItem.price" placeholder="Price (e.g. $5/day)">
-            <p></p>
-            <img :src="findItem.path" />
-        </div>
-        <div class="actions" v-if="findItem">
-            <button @click="deleteItem(findItem)">Delete</button>
-            <button @click="editItem(findItem)">Edit</button>
-        </div>
+            <div class="upload" v-if="addItem">
+                <p>{{addItem.name}} successfully added!</p>
+            </div>
+          </div>
+          <div class="edit">
+            <h2>Edit or Delete an Item</h2>
+            <div>
+                <input class="suggestions input" v-model="findTitle" placeholder="Search">
+                <div class="suggestions" v-if="suggestionsItem.length > 0">
+                  <div class="suggestion" v-for="s in suggestionsItem" :key="s.id" @click="selectItem(s)">{{s.name}}
+                  </div>
+                </div>
+            </div>
+            <div class="upload row" v-if="findItem">
+                <img :src="findItem.path" />
+                <div>
+                  <input v-model="findItem.name">
+                  <p></p>
+                  <textarea v-model="findItem.discription"></textarea>
+                  <p></p>
+                  <input v-model="findItem.price" placeholder="Price (e.g. $5/day)">
+                </div>
+            </div>
+            <div class="actions" v-if="findItem">
+                <button @click="deleteItem(findItem)">Delete</button>
+                <button @click="editItem(findItem)">Edit</button>
+            </div>
+          </div>
         </div>
     </div>
     <div v-else>
-        <h3>Choose a user</h3>
+        <h2>Choose a profile</h2>
     </div>
 </div>
 </template>
@@ -246,9 +254,41 @@ export default {
 </script>
 
 <style scoped>
+.row {
+  align-items: flex-start;
+}
+
+button {
+  height: 20px;
+  margin: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+img {
+  max-width: 40%;
+}
+
+p, h2{
+  padding: 10px;
+}
+
+.add, .edit {
+  width: 50%;
+}
+
+.form * {
+  width: 200px;
+}
+
+.input {
+  padding: 1px 2px;
+}
+
 .suggestions {
   width: 200px;
   border: 1px solid #ccc;
+  margin: 0 auto;
 }
 
 .suggestion {
@@ -258,5 +298,17 @@ export default {
 .suggestion:hover {
   background-color: #5BDEFF;
   color: #fff;
+}
+
+.profile-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.upload {
+  padding: 10px;
+  margin-top: 15px;
+  margin-bottom: 5px;
 }
 </style>

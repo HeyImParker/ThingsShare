@@ -1,11 +1,12 @@
 <template>
-  <div class="item">
-    <h1>{{item.name}}</h1>
+  <div class="row item">
     <img :src="item.path" />
-    <p>{{item.price}}</p>
-    <p>{{item.discription}}</p>
-    <p>{{owner.name}}</p>
-    <p>{{owner.location}}</p>
+    <div class="left-side">
+      <h1>{{item.name}}</h1>
+      <p class="owner">{{owner.name}} -- {{owner.location}}</p>
+      <h3>{{item.price}}</h3>
+      <p style="padding-top:20px">{{item.discription}}</p>
+    </div>
   </div>
 </template>
 
@@ -44,3 +45,39 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.item {
+  width: 85%;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+.left-side {
+  width: 50%;
+}
+
+.left-side * {
+  text-align: left;
+  padding: 5px 15px;
+}
+
+img {
+  max-width: 50%;
+}
+
+h1 {
+  margin-top: 10px;
+  font-size: 2.5em;
+}
+
+h3 {
+  font-size: 1.5em;
+}
+
+.owner {
+  color: rgb(117, 117, 117);
+  font-style: italic;
+  font-size: .9em;
+}
+</style>

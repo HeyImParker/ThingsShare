@@ -1,11 +1,13 @@
 <template>
   <div class="home">
     <h1>Catalog</h1>
-    <router-link v-for="item in items" :key="item.id" :to="'/item/' + item._id">
-      <h2>{{item.name}}</h2>
-      <img :src="item.path" />
-      <p>{{item.price}}</p>
-    </router-link>
+    <div class="grid">
+      <router-link class="item" v-for="item in items" :key="item.id" :to="'/item/' + item._id">
+        <h2>{{item.name}}</h2>
+        <img :src="item.path" />
+        <p>{{item.price}}</p>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -34,3 +36,23 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 2em;
+    width: 90%;
+}
+
+.item {
+  width: 255px;
+  border: grey solid 1px;
+  margin: 10px;
+}
+
+img {
+  max-width: 90%;
+}
+</style>
