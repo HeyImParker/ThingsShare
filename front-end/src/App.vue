@@ -5,6 +5,9 @@
       <router-link to="/profile">Profile</router-link>
     </div>
     <router-view/>
+    <div class="footer">
+        <p>https://github.com/HeyImParker/ThingsShare</p>
+  </div>
   </div>
 </template>
 
@@ -53,5 +56,10 @@
 
 #nav a.router-link-exact-active {
   color: var(--main);
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
 }
 </style>
