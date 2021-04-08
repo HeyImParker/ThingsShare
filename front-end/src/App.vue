@@ -15,10 +15,23 @@
     box-sizing: border-box;
 }
 
+/* color scheme */
+:root {
+  --main: #05A8AA;
+  --neutral: #ecd7af;
+  --grey: #505d69;
+}
+
 .row {
   display: flex;
   justify-content: space-around;
   align-items: center;
+}
+
+.horizonal-break {
+  width: 90%;
+  margin: 0 auto;
+  border-bottom: var(--neutral) solid 2px;
 }
 
 #app {
@@ -35,10 +48,10 @@
 
 #nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--grey);
 }
 
 #nav a.router-link-exact-active {
-  color: #42b983;
+  color: var(--main);
 }
 </style>

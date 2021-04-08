@@ -90,7 +90,6 @@ app.get('/api/profile/:profileID', async (req, res) => {
 
 app.put('/api/profile/:profileID', async (req, res) => {
     try {
-        console.log(req.params.profileID); ///debug
         let profile = await Profile.findOne({_id:req.params.profileID});
         if (!profile) {
             res.sendStatus(404);

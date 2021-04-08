@@ -19,7 +19,7 @@
             </div>
             <div>
               <button @click="editToggle()">Cancel</button>
-              <button @click="editProfile()">Confirm</button>
+              <button @click="editProfile()">Confirm Changes</button>
               <button @click="deleteProfile()">Delete</button>
             </div>
           </div>
@@ -40,9 +40,14 @@
                 <p></p>
                 <textarea v-model="item.discription" placeholder="Discription"></textarea>
                 <p></p>
-                <input v-model="item.price" placeholder="Price">
+                <input v-model="item.price" placeholder="Price (e.g. $5/day)">
                 <p></p>
+                <label class="button file">
                 <input type="file" name="photo" @change="fileChanged">
+                <p>Photo</p>
+                </label>
+                <p></p>
+                <div class="horizonal-break"></div>
                 <p></p>
                 <button @click="upload">Upload</button>
             </div>
@@ -61,12 +66,12 @@
             </div>
             <div class="upload row" v-if="findItem">
                 <img :src="findItem.path" />
-                <div>
+                <div class="edit-right">
                   <input v-model="findItem.name">
                   <p></p>
-                  <textarea v-model="findItem.discription"></textarea>
+                  <input v-model="findItem.price" placeholder="Price">
                   <p></p>
-                  <input v-model="findItem.price" placeholder="Price (e.g. $5/day)">
+                  <textarea v-model="findItem.discription"></textarea>
                 </div>
             </div>
             <div class="actions" v-if="findItem">
@@ -149,6 +154,7 @@ export default {
     changeProfile() {
       this.profile = null;
       this.addItem = null;
+      this.findItem = null;
     },
     //Profile option buttons
     editToggle() {
@@ -258,15 +264,41 @@ export default {
   align-items: flex-start;
 }
 
+.file {
+  display: inline-block;
+  padding: 6px 12px;
+  text-align: center;
+  padding: 0;
+}
+
+.file p {
+  padding: 0;
+  width: 190px;
+  height: 20px;
+  padding: auto;
+}
+
+.button,
 button {
   height: 20px;
   margin: 5px;
   padding-left: 5px;
   padding-right: 5px;
+  background: var(--main);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  border: none;
+  font: 400 13.3333px Arial;
 }
 
 img {
   max-width: 40%;
+}
+
+input[type=file] {
+  display: none;
 }
 
 p, h2{
@@ -296,19 +328,23 @@ p, h2{
 }
 
 .suggestion:hover {
-  background-color: #5BDEFF;
-  color: #fff;
+  background-color: var(--neutral);
 }
 
 .profile-info {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: var(--neutral);
 }
 
 .upload {
   padding: 10px;
   margin-top: 15px;
   margin-bottom: 5px;
+}
+
+.edit-right {
+  margin-top: 10px;
 }
 </style>
